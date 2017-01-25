@@ -170,6 +170,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 GetPlayer()->TextEmote(msg);
             else if (type == CHAT_MSG_YELL)
                 GetPlayer()->Yell(msg, lang);
+			CharacterDatabase.PExecute("INSERT INTO chat_log (from_account_id, msg_type, msg, time) VALUES (%u, %u, '%s', NOW())", GetPlayer()->GetObjectGuid().GetCounter(), type, msg.c_str());
         } break;
 
         case CHAT_MSG_WHISPER:
@@ -212,6 +213,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             }
 
             GetPlayer()->Whisper(msg, lang, player->GetObjectGuid());
+			CharacterDatabase.PExecute("INSERT INTO chat_log (from_account_id, to_account_id, msg_type, msg, time) VALUES (%u, %u, %u, '%s', NOW())", GetPlayer()->GetObjectGuid().GetCounter(), player->GetObjectGuid().GetCounter(), type, msg.c_str());
         } break;
 
         case CHAT_MSG_PARTY:
